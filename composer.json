@@ -1,7 +1,7 @@
 {
-    "name": "nbos/php-sdk",
+    "name": "nbos/idn-sdk-php",
     "description": "Nbos SDK for PHP",
-    "keywords": ["nbos", "sdk"],
+    "keywords": ["nbos", "sdk", "idn"],
     "type": "library",
     "homepage": "https://github.com/nbostech",
     "license": "NBOS Platform",
