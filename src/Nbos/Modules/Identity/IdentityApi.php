@@ -41,9 +41,21 @@ class IdentityApi extends NetworkApi {
     public function signup($data){
         $signUpModel = new MemberSignupModel();
         $signUpModel->bind($data);
-
+        //echo '<pre>';print_r($signUpModel); exit;
         $remoteApi = new IdentityRemoteApi($this);
         return $remoteApi->signup($signUpModel);
+    }
+    public function update($data){
+        $signUpModel = new MemberApiModel();
+        $signUpModel->bind($data);
+        //echo '<pre>';print_r($signUpModel); exit;
+        $remoteApi = new IdentityRemoteApi($this);
+        return $remoteApi->update($signUpModel);
+    }
+    public function changePassword($password, $newPassword){
+        $data = ["password" => $password, "newPassword" => $newPassword];
+        $remoteApi = new IdentityRemoteApi($this);
+        return $remoteApi->changePassword($data);
     }
 
 } 

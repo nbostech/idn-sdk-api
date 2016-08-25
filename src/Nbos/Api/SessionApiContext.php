@@ -19,14 +19,14 @@ class SessionApiContext extends AbstractApiContext {
     public function __construct($config){
 
         parent::__construct($config['name']);
-        $name = $config['name'];
+        $this->name = $name = $config['name'];
 
         if(!array_key_exists($name, $_SESSION))
             $_SESSION[$config['name']] = array('tokens'=>[],'hosts'=>[]);
 
-         // echo '<pre>';        print_r($_SESSION);exit;
+    // echo '<pre>';        print_r($_SESSION);exit;
 
-         //$_SESSION = array();
+     //$_SESSION = array();
 
         $this->setClientCredentials($config['client.credentials']);
         $this->setHost($name, $config['host']);
@@ -58,13 +58,13 @@ class SessionApiContext extends AbstractApiContext {
     public function setUserToken($moduleName, TokenApiModel $tokenApiModel) {
 
         $tokens = $this->getData('tokens');
-        $tokens[] = array($moduleName.'user_token' => $tokenApiModel);
+        $tokens[$moduleName.'user_token'] = $tokenApiModel;
         $this->setData('tokens', $tokens);
     }
 
     public function getUserToken($moduleName) {
         $tokens = $this->getData('tokens');
-        return $tokens[$moduleName.'client_token'];
+        return $tokens[$moduleName.'user_token'];
     }
 
     public function setHost($moduleName, $host) {

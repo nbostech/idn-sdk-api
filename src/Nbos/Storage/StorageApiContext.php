@@ -24,6 +24,7 @@ abstract class StorageApiContext implements ApiContext {
             self::$apiContext[$name] = new InMemoryApiContext();
         }
         */
+
         return self::$apiContexts[$name];
     }
 

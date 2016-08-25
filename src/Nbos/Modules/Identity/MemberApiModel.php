@@ -8,18 +8,21 @@
 
 namespace Nbos\Modules\Identity;
 
+use Nbos\Api\Serializable;
 
 class MemberApiModel {
-private $id;
-private $email;
-private $firstName;
-private $lastName;
-private $phone;
-private $description;
-private $uuid;
-private $isExternal;
-private $socialAccounts;
-private $emailConnects;
+    use Serializable;
+
+    private $id;
+    private $email;
+    private $firstName;
+    private $lastName;
+    private $phone;
+    private $description;
+    private $uuid;
+    private $isExternal;
+    private $socialAccounts;
+    private $emailConnects;
 
     /**
      * @param mixed $description

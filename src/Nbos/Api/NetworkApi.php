@@ -68,9 +68,9 @@ class NetworkApi
      * @param array $params
      * @return Guzzle\Http\Message\Response
      */
-    public function get($url, $body, $authorization = false, $bodyType='', $moduleName="app", $moduleKey=false)
+    public function get($url, $body, $authorization = false, $bodyType='', $moduleName="app", $moduleKey=false, $isUser=false)
     {
-        $requestBody =  $this->prepareRequestBody($body, $authorization, $bodyType,$moduleName,$moduleKey);
+        $requestBody =  $this->prepareRequestBody($body, $authorization, $bodyType,$moduleName,$moduleKey,$isUser);
 
         try{
             $response = $this->client()->request('GET', $url, $requestBody);
@@ -88,10 +88,10 @@ class NetworkApi
      * @param string $body
      * @return Guzzle\Http\Message\Response
      */
-    public function post($url, $body, $authorization = false, $bodyType='form_params', $moduleName="app", $moduleKey=false)
+    public function post($url, $body, $authorization = false, $bodyType='form_params', $moduleName="app", $moduleKey=false,$isUser=false)
     {
 
-        $requestBody =  $this->prepareRequestBody($body, $authorization, $bodyType, $moduleName, $moduleKey);
+        $requestBody =  $this->prepareRequestBody($body, $authorization, $bodyType, $moduleName, $moduleKey, $isUser);
         try{
 
             $response = $this->client()->request('POST', $url, $requestBody);
@@ -104,7 +104,7 @@ class NetworkApi
 
     }
 
-    private function prepareRequestBody($body, $authorization = false, $bodyType, $moduleName, $moduleKey) {
+    private function prepareRequestBody($body, $authorization = false, $bodyType, $moduleName, $moduleKey, $isUser) {
         $requestBody = array();
         switch($bodyType){
             case 'form_params':
@@ -116,7 +116,9 @@ class NetworkApi
         }
         if($authorization == true) {
             $apiContext =  \Nbos\Storage\StorageApiContext::get($moduleName);
-            $clientToken = $apiContext->getClientToken();
+
+            $clientToken = $isUser ? $apiContext->getUserToken('identity') : $apiContext->getClientToken();
+
 
             $bearerToken = $clientToken->getAccess_token();
 
@@ -134,9 +136,15 @@ class NetworkApi
      *
      * @return Guzzle\Http\Message\Response
      */
-    public function put($url, $body)
+    public function put($url, $body, $authorization = false, $bodyType='form_params', $moduleName="app", $moduleKey=false, $isUser=true)
     {
-        return $this->sendResponse($this->client()->put($url, ['body' => $body]));
+        $requestBody =  $this->prepareRequestBody($body, $authorization, $bodyType, $moduleName, $moduleKey,$isUser);
+        try{
+            $response = $this->client()->request('PUT', $url, $requestBody);
+            return $this->sendResponse($response->getStatusCode(), $response);
+        }catch (\GuzzleHttp\Exception\ClientException $e){
+            return $this->sendResponse($e->getCode(), $e->getResponse());
+        }
     }
 
     /**

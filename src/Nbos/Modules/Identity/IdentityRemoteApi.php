@@ -33,7 +33,7 @@ class IdentityRemoteApi {
         $this->signupUrl = $this->baseIdentityUrl ."/users/signup";
         $this->connectUrl = $this->baseIdentityUrl ."/auth/social/{connectService}/connect";
         $this->authorizeUrl = $this->baseIdentityUrl ."/auth/social/{authorizeService}/authorize";
-        $this->profileUrl = $this->baseIdentityUrl . "/users/{uuid}";
+        $this->profileUrl = $this->baseIdentityUrl . "/users";
         $this->forgotUrl = $this->baseIdentityUrl ."/auth/forgotPassword";
         $this->changeUrl = $this->baseIdentityUrl ."/auth/changePassword";
         $this->logoutUrl = $this->baseIdentityUrl ."/auth/logout";
@@ -41,10 +41,15 @@ class IdentityRemoteApi {
 
         $this->tokenVerifyUrl =   "api/oauth/v0/tokens";
 
-   }
+    }
+
+    private function getProfileUrl($uuid){
+        return $this->profileUrl."/".$uuid;
+    }
+
     public function getToken(){
 
-        $apiContext =  \Nbos\Api\SessionApicontext::get("app");
+        $apiContext =  \Nbos\Storage\StorageApiContext::get("app");
 
         $body = array(
                         "client_id" => $apiContext->getClientCredentials()['client'],
@@ -63,6 +68,7 @@ class IdentityRemoteApi {
         return $token->toJson();
 
     }
+
     public function getModuleToken($moduleName){
 
         $apiContext =  \Nbos\Storage\StorageApiContext::get($moduleName);
@@ -95,6 +101,7 @@ class IdentityRemoteApi {
         return false;
 
     }
+
     public function validateRequest($bearerToken, $moduleName, $moduleKey){
 
         $apiContext =  \Nbos\Storage\StorageApiContext::get($moduleName);
@@ -124,6 +131,7 @@ class IdentityRemoteApi {
         }
 
     }
+
     public function login($loginModel){
 
         $bodyRaw = $loginModel->toArray();
@@ -134,30 +142,30 @@ class IdentityRemoteApi {
             // Success handler
             $responseData =  json_decode($response->getMessage(), true);
 
-            $apiContext =  \Nbos\Api\SessionApicontext::get("app");
+            $apiContext =  \Nbos\Storage\StorageApiContext::get("app");
 
             $token = new TokenApiModel();
             $token->setData($responseData['token'], true);
             $apiContext->setUserToken("identity", $token);
             //TODO:: Set user model
         }
-
         return $response;
-
     }
+
     public function signup($signUpModel){
         $bodyRaw = $signUpModel->toArray();
-
-        $response =  $this->httpClient->post($this->signupUrl.'sd', $bodyRaw, true,'json');
-
-        if($response instanceof \Nbos\Api\SuccessResponse){
-             // Success handler
-        }else if($response instanceof \Nbos\Api\ValidationErrorResponse){
-            // error handler
-        }else{
-            // invalid error handler
-        }
+        $response =  $this->httpClient->post($this->signupUrl, $bodyRaw, true,'json');
         return $response;
     }
 
+    public function update($userModel){
+        $bodyRaw = $userModel->toArray();
+        $response =  $this->httpClient->put($this->getProfileUrl($bodyRaw['id']), $bodyRaw, true,'json');
+        return $response;
+    }
+
+    public function changePassword($data){
+        $response =  $this->httpClient->post($this->changeUrl, $data, true,'json','app', false, true);
+        return $response;
+    }
 } 
